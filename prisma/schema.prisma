@@ -96,33 +96,37 @@ model Cart {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Order     Order[]
 }
 
 model CartItem {
   id Int @id @default(autoincrement())
 
-  productItemId Int
-  productItem   ProductItem @relation(fields: [productItemId], references: [id])
-
-  cartId Int
   cart   Cart @relation(fields: [cartId], references: [id])
+  cartId Int
+
+  productItem   ProductItem @relation(fields: [productItemId], references: [id])
+  productItemId Int
 
   ingredients Ingredient[]
   quantity    Int
-  pizzaSize   Int?
-  type        Int?
+  // pizzaSize   Int?
+  // type        Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    Int?
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
 }
 
 model Order {
   id Int @id @default(autoincrement())
 
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
+
+  token String
 
   items Json?
 
@@ -138,6 +142,8 @@ model Order {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Cart      Cart?    @relation(fields: [cartId], references: [id])
+  cartId    Int?
 }
 
 model VerificationCode {
@@ -146,12 +152,12 @@ model VerificationCode {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  code String
+  code String @unique
 
-  expiresAt DateTime @default(now())
+  // expiresAt DateTime @default(now())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
+  // updatedAt DateTime @updatedAt
   @@unique([userId, code])
 }
 
