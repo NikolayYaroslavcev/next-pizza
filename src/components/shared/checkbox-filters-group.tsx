@@ -2,7 +2,7 @@
 
 import React, {ChangeEvent} from 'react';
 import {FilterChecboxProps, FilterCheckbox} from "@/components/shared/filter-checkbox";
-import {Input} from "@/components/ui";
+import {Input, Skeleton} from "@/components/ui";
 
 
 type Item = FilterChecboxProps;
@@ -10,12 +10,15 @@ type Item = FilterChecboxProps;
 interface Props {
     title: string;
     items: Item[];
-    defaultItems: Item[];
+    defaultItems?: Item[];
     limit?: number;
+    loading?: boolean;
     searchInputPlaceholder?: string;
-    onChange?: (values: string[]) => void;
+    onClickCheckbox?: (id: string) => void;
     defaultValue?: string[];
+    selected: Set<string>;
     className?: string;
+    name: string;
 }
 
 export const CheckboxFiltersGroup: React.FC<Props> = (
@@ -24,9 +27,12 @@ export const CheckboxFiltersGroup: React.FC<Props> = (
         items,
         defaultItems,
         limit = 5,
+        loading,
         searchInputPlaceholder = 'Поиск...',
         className,
-        onChange,
+        onClickCheckbox,
+        selected,
+        name,
         defaultValue,
     }
 ) => {
@@ -34,12 +40,27 @@ export const CheckboxFiltersGroup: React.FC<Props> = (
 
     const [searchValue, setSearchValue] = React.useState('')
 
-    const list = showAll ? items.filter((item)=> item.text.toLowerCase().includes(searchValue.toLowerCase())) : defaultItems.slice(0, limit);
-
 
     const onChangeSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchValue(e.target.value)
     }
+
+
+    if (loading) {
+        return (
+            <div className={className}>
+                <p className='font-bold mb-3'>{title}</p>
+                {...Array(limit)
+                    .fill(0)
+                    .map((_, index) => (
+                        <Skeleton key={index} className='h-6 mb-4 rounded-[8px]'/>))}
+                <Skeleton className='w-28 h-6 mb-4 rounded-[8px]'/>
+            </div>
+        )
+    }
+
+    const list = showAll ? items.filter((item) => item.text.toLowerCase().includes(searchValue.toLowerCase()))
+        : (defaultItems || items).slice(0, limit);
 
 
     return (
@@ -48,7 +69,8 @@ export const CheckboxFiltersGroup: React.FC<Props> = (
 
             {showAll &&
                 <div className='mb-5'>
-                    <Input onChange={onChangeSearchInput} placeholder={searchInputPlaceholder} className='bg-gray-50 border-none'/>
+                    <Input onChange={onChangeSearchInput} placeholder={searchInputPlaceholder}
+                           className='bg-gray-50 border-none'/>
                 </div>
             }
 
@@ -60,8 +82,9 @@ export const CheckboxFiltersGroup: React.FC<Props> = (
                         text={item.text}
                         value={item.value}
                         endAdornment={item.endAdornment}
-                        checked={false}
-                        onCheckedChange={(ids) => console.log(ids)}
+                        checked={selected?.has(item.value)}
+                        onCheckedChange={() => onClickCheckbox?.(item.value)}
+                        name={name}
                     />
                 ))}
             </div>
