@@ -1,3 +1,4 @@
+export {SearchInput} from './search-input'
 export {Container} from './container'
 export {Header} from './header'
 export {Title} from './title'
@@ -10,4 +11,5 @@ export {RangeSlider} from './range-slider'
 export {CheckboxFiltersGroup} from './checkbox-filters-group'
 export {ProductCart} from './product-cart'
 export {ProductsGroupList} from './products-group-list'
+
 
